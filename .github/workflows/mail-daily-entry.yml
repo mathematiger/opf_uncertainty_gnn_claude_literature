@@ -1,0 +1,39 @@
+# Mails the newest log.md entry to the reading list whenever the daily job pushes a new one.
+# Needs three repository secrets: MAIL_USERNAME (sender address), MAIL_PASSWORD (SMTP / app password),
+# MAIL_TO (comma-separated recipients, kept as a secret so the addresses never appear in the repo).
+name: Mail daily entry
+
+on:
+  push:
+    branches: [main]
+    paths: [log.md]
+  workflow_dispatch:
+
+jobs:
+  mail:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract the newest entry
+        id: entry
+        run: |
+          # Entries are prepended: the newest starts at the first "## " heading and ends at the first "---" after it.
+          awk '/^## / {found=1} found && /^---$/ {exit} found {print}' log.md > entry.md
+          test -s entry.md
+          echo "subject=$(head -n 1 entry.md | sed 's/^## //')" >> "$GITHUB_OUTPUT"
+
+      - name: Send
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          from: Daily Reading <${{ secrets.MAIL_USERNAME }}>
+          to: ${{ secrets.MAIL_USERNAME }}
+          bcc: ${{ secrets.MAIL_TO }}
+          subject: ${{ steps.entry.outputs.subject }}
+          html_body: file://entry.md
+          convert_markdown: true
