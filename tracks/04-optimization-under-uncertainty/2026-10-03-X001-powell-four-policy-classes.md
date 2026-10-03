@@ -1,7 +1,3 @@
-# Reading log
-
-All entries, newest first. See [`curriculum.md`](curriculum.md) for the plan.
-
 ## 2026-10-03 (Saturday) — X001 · Track 04: Stochastic, chance-constrained, risk-averse & robust optimization — One language for decisions under uncertainty: Powell's four policy classes
 
 **Type:** Cross-phase preview
@@ -80,5 +76,3 @@ This is the first entry in the log, so there are no earlier entries to build on.
 3. The lookahead model's objective (cost under the assumed deterministic future) is being confused with the base model's objective (expected cost under the true distribution of `W`). A policy must be evaluated on the base model: simulate it on many sampled or historical outcomes not used to build it, and average the realized cost and constraint violations.
 
 </details>
-
----
